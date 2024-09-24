@@ -1,52 +1,80 @@
 package io.github.oceloamarante;
 
 import io.github.oceloamarante.domain.entity.Cliente;
-import io.github.oceloamarante.domain.repositorio.Clientes;
+import io.github.oceloamarante.domain.entity.Pedido;
+import io.github.oceloamarante.domain.repository.Clientes;
+import io.github.oceloamarante.domain.repository.Pedidos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @SpringBootApplication
 public class VendasApplication {
 
     @Bean
-    public CommandLineRunner init(@Autowired Clientes clientes){
+    public CommandLineRunner init(
+            @Autowired Clientes clientes,
+            @Autowired Pedidos pedidos
+    ){
         return args -> {
             System.out.println("Salvando clientes:");
-            clientes.salvar(new Cliente("João"));
-            clientes.salvar(new Cliente("Maria"));
-            clientes.salvar(new Cliente("Fernanda"));
+            clientes.save(new Cliente("João"));
+            //clientes.save(new Cliente("Maria"));
 
-            List<Cliente> todosClientes = clientes.obterTodos();
-            todosClientes.forEach(System.out::println);
+            Cliente maria = new Cliente("Maria");
+            clientes.save(maria);
 
-            System.out.println("Atualizando clientes:");
-            todosClientes.forEach(c -> {
-                c.setNome(c.getNome() + " atualizado.");
-                clientes.atualizar(c);
-            });
+            Pedido p = new Pedido();
+            p.setCliente(maria);
+            p.setDataPedido(LocalDate.now());
+            p.setTotal(BigDecimal.valueOf(100));
 
-            todosClientes = clientes.obterTodos();
-            todosClientes.forEach(System.out::println);
+            pedidos.save(p);
 
-            System.out.println("Buscando clientes:");
-            clientes.buscarNome("Mar").forEach(System.out::println);
+//            Cliente cliente = clientes.findClienteFetchPedidos(maria.getId());
+//            System.out.println(cliente);
+//            System.out.println(cliente.getPedidos());
 
-            System.out.println("excluindo clientes");
-            clientes.obterTodos().forEach(c -> {
-                clientes.deletar(c.getId());
-            });
+            pedidos.findByCliente(maria).forEach(System.out::println);
 
-            todosClientes = clientes.obterTodos();
-            if(todosClientes.isEmpty()){
-                System.out.println("Nenhum cliente encontrado.");
-            }else{
-                todosClientes.forEach(System.out::println);
-            }
+//            List<Cliente> result = clientes.encontrarPorNome("João");
+//            result.forEach(System.out::println);
+
+//            boolean existe = clientes.existsByNome("João");
+//            System.out.println("Existe um cliente com o nome João? " + existe);
+
+//            List<Cliente> todosClientes = clientes.findAll();
+//            todosClientes.forEach(System.out::println);
+//
+//            System.out.println("Atualizando clientes:");
+//            todosClientes.forEach(c -> {
+//                c.setNome(c.getNome() + " atualizado.");
+//                clientes.save(c);
+//            });
+//
+//            todosClientes = clientes.findAll();
+//            todosClientes.forEach(System.out::println);
+//
+//            System.out.println("Buscando clientes:");
+//            clientes.findByNomeLike("Mar").forEach(System.out::println);
+//
+//            System.out.println("excluindo clientes");
+//            clientes.findAll().forEach(c -> {
+//                clientes.delete(c);
+//            });
+//
+//            todosClientes = clientes.findAll();
+//            if(todosClientes.isEmpty()){
+//                System.out.println("Nenhum cliente encontrado.");
+//            }else{
+//                todosClientes.forEach(System.out::println);
+//            }
 
         };
     }
